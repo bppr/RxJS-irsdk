@@ -38,9 +38,13 @@ export function main() {
     mergeMap(({ previous, current }) => incidentMappers.flatMap(m => m(previous, current))),
     groupBy(incident => incident.car.number),
     mergeMap(group => group.pipe(bufferTime(2000))),
-    filter(incidents => incidents.length > 0)
+    filter(incidents => incidents.length > 0),
+    map(incidents => ({ car: incidents[0].car, incidents }))
   )
 
   clock.subscribe(session => console.log('clock', [session.index, session.time]));
-  referrals.subscribe(r => console.log('referral', r[0].car.number, r.map(i => i.xCount)));
+
+  referrals.subscribe(r => 
+    console.log('referral', r.car.number, r.incidents.map(i => i.xCount))
+  );
 }
