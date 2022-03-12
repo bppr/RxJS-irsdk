@@ -12,7 +12,7 @@ export function xCount(previous: AppState, state: AppState): Incident[] {
       car, 
       xCount: car.xCount - prevState.xCount,
       type: "Incident Count",
-      time: state.currentSession
+      time: state.session
     }]
   });
 }

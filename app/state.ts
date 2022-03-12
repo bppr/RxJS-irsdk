@@ -5,7 +5,7 @@ import { map, tap } from 'rxjs/operators'
 
 export type AppState = {
   weekend: { sessions: string[], trackLength: string }
-  currentSession: { index: number, time: number, type: string }
+  session: { index: number, time: number, type: string }
   replayState: { session: number, time: number }
   camera: { isPaused: boolean, carIndex: number }
   cars: CarState[]
@@ -27,7 +27,7 @@ export type CarState = {
 
 const INITIAL_STATE: AppState = {
   weekend: { sessions: [], trackLength: '1.0 km' },
-  currentSession: { index: 0, time: 0, type: 'Unknown' },
+  session: { index: 0, time: 0, type: 'Unknown' },
   replayState: { session: 0, time: 0 },
   camera: { isPaused: false, carIndex: 0 },
   cars: [],
@@ -46,7 +46,7 @@ export function watch(sdk: SDK.Client): Observable<AppStateUpdate> {
   )
 }
 
-function toAppState(previous: AppState, telemetry: SDK.Telemetry, session: SDK.SessionInfo): AppStateUpdate {
+function toAppState(previous: AppState, telemetry: SDK.TelemetryValues, session: SDK.SessionData): AppStateUpdate {
   const cars = toCarState(telemetry, session)
 
   return { 
@@ -56,7 +56,7 @@ function toAppState(previous: AppState, telemetry: SDK.Telemetry, session: SDK.S
         sessions: session.SessionInfo.Sessions.map((s: {SessionType: string })=> s.SessionType),
         trackLength: session.WeekendInfo.TrackLength
       },
-      currentSession: { 
+      session: { 
         index: telemetry.SessionNum,
         time: telemetry.SessionTime,
         type: session.SessionInfo.Sessions[telemetry.SessionNum]?.SessionType ?? 'Unknown'
@@ -75,7 +75,7 @@ function toAppState(previous: AppState, telemetry: SDK.Telemetry, session: SDK.S
   }
 }
 
-function toCarState(telemetry: SDK.Telemetry, session: SDK.SessionInfo): CarState[] {
+function toCarState(telemetry: SDK.TelemetryValues, session: SDK.SessionData): CarState[] {
   return session.DriverInfo.Drivers.map(driver => {
     const index = driver.CarIdx;
 

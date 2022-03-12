@@ -4,14 +4,25 @@ declare module 'node-irsdk-2021' {
 
   type Client = {
     on<T>(ev: string, handler: (t: T) => void)
+
+    camControls: {
+      switchToCar(carNumber: string): void
+    }
+
+    playbackControls: {
+      searchTs(sessionNumber: number, sessionTimeMS: number): void
+      search(replaySearchMode: RpySrchMode): void
+      play(): void
+      pause(): void
+    }
   }
 
   interface TelemetryEvent {
     timestamp: Date
-    values: Telemetry
+    values: TelemetryValues
   }
   
-  interface Telemetry {
+  interface TelemetryValues {
     SessionNum: number
     SessionTime: number
     ReplaySessionNum: number
@@ -37,10 +48,10 @@ declare module 'node-irsdk-2021' {
   
   interface SessionEvent {
     timestamp: Date
-    data: SessionInfo
+    data: SessionData
   }
   
-  interface SessionInfo {
+  interface SessionData {
     DriverInfo: {
       Drivers: Driver[]
     }

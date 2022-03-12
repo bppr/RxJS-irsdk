@@ -18,13 +18,13 @@ export function offTrack({ timeLimit, rejoinRange }: OffTrackConfig): IncidentMa
   return createTargetStateTimer({
     timeLimit,
     inTargetState: (car) => car.trackSurface === "Off-Track",
-    onTimeout: (car, state) => [{ car, time: state.currentSession, type: "Off-Track" }],
-    onStateExited(car, state, __duration, __timeExceeded) {
+    onTimeout: (car, appState) => [{ car, time: appState.session, type: "Off-Track" }],
+    onStateExited(car, appState, __duration, __timeExceeded) {
       if (car.trackSurface !== "OnTrack")
         return []; // don't create incidents for reset | disappear
 
-      return getNearbyCars(state, car).length > 0
-        ? [{ car, time: state.currentSession, type: "Unsafe Rejoin" }]
+      return getNearbyCars(appState, car).length > 0
+        ? [{ car, time: appState.session, type: "Unsafe Rejoin" }]
         : [];
     }
   });

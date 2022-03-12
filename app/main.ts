@@ -1,11 +1,10 @@
 import * as SDK from 'node-irsdk-2021'
-import { pipe } from 'rxjs';
-import { map, mergeMap, groupBy, bufferTime, filter, distinctUntilChanged, throttleTime, tap, share } from 'rxjs/operators'
-import { sumBy } from 'lodash'
+import { map, mergeMap, groupBy, bufferTime, filter, throttleTime, share } from 'rxjs/operators'
 
-import { watch, CarState, AppState, AppStateUpdate } from "./state"
+import { watch, CarState, AppState } from "./state"
 import { xCount } from './referrals/xCount'
 import { offTrack } from './referrals/offTrack'
+import { sumBy } from 'lodash'
 
 export type Incident = {
   car: CarState
@@ -30,15 +29,15 @@ export function main() {
     .pipe(share()); // share allows us to multicast to many streams without recomputing appState
 
   const clock = stream.pipe(
-    map(({ current }) => current.currentSession),
+    map(({ current }) => current.session),
     throttleTime(1000)
   )
   
   const referrals = stream.pipe(
-    mergeMap(({ previous, current }) => incidentMappers.flatMap(m => m(previous, current))),
+    mergeMap(update => incidentMappers.flatMap(im => im(update.previous, update.current))),
     groupBy(incident => incident.car.number),
     mergeMap(group => group.pipe(bufferTime(2000))),
-    filter(incidents => incidents.length > 0),
+    filter(incidents => sumBy(incidents, i => i.xCount ?? 0) > 0),
     map(incidents => ({ car: incidents[0].car, incidents }))
   )
 

@@ -16,7 +16,7 @@ export function createTargetStateTimer(cfg: TimerConfig): IncidentMapper {
   const records = new Map<number, TimerRecord>();
 
   return function(__old: AppState, state: AppState): Incident[] {
-    const sessionTime = state.currentSession.time;
+    const sessionTime = state.session.time;
 
     return state.cars.flatMap(car => {
       const index = car.index;
