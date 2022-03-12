@@ -1,0 +1,15 @@
+{
+  "exclude": ["build"],
+  "ts-node": { "files": true },
+  "compilerOptions": {
+    "target": "es2016",
+    "outDir": "./build",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": "./"
+  }
+}
