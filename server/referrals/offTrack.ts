@@ -1,4 +1,4 @@
-import { IncidentMapper } from "app/main";
+import { IncidentMapper } from "../streams";
 import { AppState, CarState } from "../state";
 import { createTargetStateTimer } from './targetStateTimer';
 

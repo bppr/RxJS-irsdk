@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import * as SDK from 'node-irsdk-2021';
 import { combineLatest, Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
+import { map, share, tap } from 'rxjs/operators'
 
 export type AppState = {
   weekend: { sessions: string[], trackLength: string }
@@ -42,7 +42,8 @@ export function watch(sdk: SDK.Client): Observable<AppStateUpdate> {
 
   return combineLatest([telemetrySource, sessionSource]).pipe(
     map(([telemetry, session]) => toAppState(prevState, telemetry.values, session.data)),
-    tap(({ current }) => prevState = current)
+    tap(({ current }) => prevState = current),
+    share()
   )
 }
 

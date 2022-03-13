@@ -1,5 +1,5 @@
 import { AppState, CarState } from "../state";
-import { Incident, IncidentMapper } from '../main';
+import { Incident, IncidentMapper } from '../streams';
 
 type TimerRecord = { startTime: number; triggered: boolean; };
 
