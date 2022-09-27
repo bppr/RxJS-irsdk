@@ -32,7 +32,8 @@ declare module 'node-irsdk-2021' {
     CarIdxLap: number[]
     CarIdxLapDistPct: number[]
     CarIdxOnPitRoad: boolean[]
-    CarIdxTrackSurface: string
+    CarIdxTrackSurface: string[]
+    CarIdxSessionFlags: string[][]
   }
   
   interface Driver {

@@ -1,5 +1,5 @@
 import { AppState } from "../state";
-import { Incident } from '../streams';
+import { Incident } from "./index";
 
 export function xCount(previous: AppState, state: AppState): Incident[] {
   return state.cars.flatMap(car => {

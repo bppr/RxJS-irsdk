@@ -1,35 +1,40 @@
-import * as SDK from 'node-irsdk-2021';
-import { map, mergeMap, groupBy, bufferTime, filter, throttleTime } from 'rxjs/operators';
-import { watch, CarState, AppState } from "./state";
-import { xCount } from './referrals/xCount';
-import { offTrack } from './referrals/offTrack';
 import { sumBy } from 'lodash';
+import * as SDK from 'node-irsdk-2021';
+import { bufferTime, filter, groupBy, map, mergeMap, throttleTime } from 'rxjs/operators';
 
-export type Incident = {
-  car: CarState
-  xCount?: number
-  time: { index: number, time: number }
-  type: string
-}
+import { detectIncidents, detectCautionIncidents } from './incidents';
+import { detectFlags } from './flags';
+import { watch } from "./state";
 
-export type IncidentMapper = (previous: AppState, current: AppState) => Incident[]
-
-export function initializeStreams(irsdk: SDK.Client) {
-  const incidentMappers = [xCount, offTrack({ timeLimit: 2.0, rejoinRange: 10 })];
+// TODO: send a little bit less data :)
+export function streams(irsdk: SDK.Client) {
   const stream = watch(irsdk);
 
   const clock = stream.pipe(
     map(({ current }) => current.session),
-    throttleTime(500)  
+    throttleTime(1000)
   );
 
-  const referrals = stream.pipe(
-    mergeMap(update => incidentMappers.flatMap(im => im(update.previous, update.current))),
+  const flags = stream.pipe(
+    map(detectFlags),
+    filter(flags => flags.length > 0)
+  );
+
+  // a group of minor incidents within 2s of one another for each car
+  const incidents = stream.pipe(
+    mergeMap(detectIncidents),
     groupBy(incident => incident.car.number),
     mergeMap(group => group.pipe(bufferTime(2000))),
     filter(incidents => sumBy(incidents, i => i.xCount ?? 0) > 0),
     map(incidents => ({ car: incidents[0].car, incidents }))
   );
 
-  return { clock, referrals };
+  const cautions = stream.pipe(
+    mergeMap(detectCautionIncidents()),
+    bufferTime(500),
+    filter(buffered => buffered.length > 1),
+    map(i => ({ cars: i.map(i => i.car.number), location: i[0].car.currentLapPct }))
+  )
+
+  return { clock, incidents, flags, cautions };
 }

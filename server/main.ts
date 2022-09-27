@@ -1,24 +1,20 @@
-import { initializeStreams } from './streams';
-import { startServer, publish } from './web';
-import * as SDK from 'node-irsdk-2021';
+import { initSDK } from './sdk';
+import { streams } from './streams';
+import { initWeb } from './web';
+
 
 export function main() {
-  const irsdk = SDK.init({
-    sessionInfoUpdateInterval: 100,
-    telemetryUpdateInterval: 50,
-  });
+  const irsdk = initSDK();
+  
+  const { clock, cautions, flags, incidents } = streams(irsdk);
+  
+  const web = initWeb(irsdk);
+  const publishTo = <T>(channel: string) => (data: T) => web.publish(channel, data)
 
-  irsdk.on('Connected', () => console.log('Connection!'));
+  // clock.subscribe(publishTo('clock'));
+  incidents.subscribe(publishTo('incident'));
+  cautions.subscribe(publishTo('caution'));
+  flags.subscribe(publishTo('flag'));
 
-  const { clock, referrals } = initializeStreams(irsdk);
-  const { server, sockets } = startServer(message => {
-    console.log('Received %s', message);
-
-    // irsdk.camControls.switchToCar(message)
-  });
-
-  clock.subscribe(session => publish(sockets.system, session));
-  referrals.subscribe(ref => publish(sockets.referral, ref));
-
-  server.listen(3000, () => console.log("Server started."));
+  web.run();
 }

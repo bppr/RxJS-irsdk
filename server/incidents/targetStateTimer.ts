@@ -1,5 +1,5 @@
 import { AppState, CarState } from "../state";
-import { Incident, IncidentMapper } from '../streams';
+import { Incident, IncidentMapper } from "./index";
 
 type TimerRecord = { startTime: number; triggered: boolean; };
 
@@ -13,13 +13,13 @@ type TimerConfig = {
 
 export function createTargetStateTimer(cfg: TimerConfig): IncidentMapper {
   const config = { ...defaultTimerConfig, ...cfg };
-  const records = new Map<number, TimerRecord>();
+  const records = new Map<string, TimerRecord>();
 
   return function(__old: AppState, state: AppState): Incident[] {
     const sessionTime = state.session.time;
 
     return state.cars.flatMap(car => {
-      const index = car.index;
+      const index = car.number;
       const record = records.get(index);
 
       const duration = record ? sessionTime - record.startTime : 0;

@@ -1,7 +1,8 @@
-import _ from 'lodash'
+import _ from 'lodash';
 import * as SDK from 'node-irsdk-2021';
-import { combineLatest, Observable } from 'rxjs'
-import { map, share, tap } from 'rxjs/operators'
+import { combineLatest, Observable } from 'rxjs';
+import { map, share, tap } from 'rxjs/operators';
+import { trackLengthState } from './utils/trackLength';
 
 export type AppState = {
   weekend: { sessions: string[], trackLength: string }
@@ -16,8 +17,9 @@ export type AppStateUpdate = { previous: AppState, current: AppState }
 
 export type CarState = {
   index: number
-  number: string,
-  driver: { name: string, team: string },
+  number: string
+  flags: string[]
+  driver: { name: string, team: string }
   xCount: number
   currentLap: number
   currentLapPct: number
@@ -84,6 +86,7 @@ function toCarState(telemetry: SDK.TelemetryValues, session: SDK.SessionData): C
       index,
       number: driver.CarNumber,
       driver: { name: driver.UserName, team: driver.TeamName},
+      flags: telemetry.CarIdxSessionFlags[index],
       xCount: driver.TeamIncidentCount,
       currentLap: telemetry.CarIdxLap[index] ?? 0,
       currentLapPct: telemetry.CarIdxLapDistPct[index] ?? -1,
