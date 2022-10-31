@@ -4,7 +4,7 @@ import * as SDK from 'node-irsdk-2021';
 
 export function initWeb(irsdk: SDK.Client) {
   const server = express()
-    .use(express.static("./build"));
+    .use(express.static("./build/ui"));
 
   const ws = new WebSocketServer({ port: 3001 })
   const inbox = createInbox(irsdk);

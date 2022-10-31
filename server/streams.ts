@@ -1,33 +1,32 @@
-import { sumBy } from 'lodash';
+import _, { sumBy } from 'lodash';
 import * as SDK from 'node-irsdk-2021';
 import { bufferTime, filter, groupBy, map, mergeMap, throttleTime } from 'rxjs/operators';
 
-import { detectIncidents, detectCautionIncidents } from './incidents';
+import { detectIncidents, detectCautionIncidents, Incident } from './incidents';
 import { detectFlags } from './flags';
-import { watch } from "./state";
+import { AppStateUpdate, watch } from "./state";
+import { IncidentGroup, SystemState } from "../ui/messages";
 
-// TODO: send a little bit less data :)
 export function streams(irsdk: SDK.Client) {
-  const stream = watch(irsdk);
+  const stream = watch(irsdk)
 
-  const clock = stream.pipe(
-    map(({ current }) => current.session),
+  const system = stream.pipe(
+    map(mapSystemData),
     throttleTime(1000)
-  );
+  )
 
   const flags = stream.pipe(
     map(detectFlags),
-    filter(flags => flags.length > 0)
-  );
+    filter(fs => fs.length > 0)
+  )
 
-  // a group of minor incidents within 2s of one another for each car
   const incidents = stream.pipe(
     mergeMap(detectIncidents),
     groupBy(incident => incident.car.number),
     mergeMap(group => group.pipe(bufferTime(2000))),
-    filter(incidents => sumBy(incidents, i => i.xCount ?? 0) > 0),
-    map(incidents => ({ car: incidents[0].car, incidents }))
-  );
+    filter(i => sumBy(i, 'xCount') > 0),
+    map(mapIncidentData),
+  )
 
   const cautions = stream.pipe(
     mergeMap(detectCautionIncidents()),
@@ -36,5 +35,26 @@ export function streams(irsdk: SDK.Client) {
     map(i => ({ cars: i.map(i => i.car.number), location: i[0].car.currentLapPct }))
   )
 
-  return { clock, incidents, flags, cautions };
+  return { system, incidents, flags, cautions };
+}
+
+function mapSystemData({ current: { session, replayState, cameraState }}: AppStateUpdate): SystemState { 
+  return { session, replayState, cameraState }
+}
+
+function mapIncidentData(incidents: Incident[]): IncidentGroup {
+  const { driver, number } = incidents[0].car
+  
+  return {
+    xCount: sumBy(incidents, 'xCount'),
+    time: incidents[0].time,
+    types: incidents.map(i => i.type),
+    incidents: incidents.map(({ type, xCount, car, time }) => ({
+      type,
+      xCount: xCount ?? 0,
+      time,
+      location: car.currentLapPct
+    })),
+    car: { driver, number }
+  }
 }

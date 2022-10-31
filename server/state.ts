@@ -2,13 +2,12 @@ import _ from 'lodash';
 import * as SDK from 'node-irsdk-2021';
 import { combineLatest, Observable } from 'rxjs';
 import { map, share, tap } from 'rxjs/operators';
-import { trackLengthState } from './utils/trackLength';
 
 export type AppState = {
   weekend: { sessions: string[], trackLength: string }
   session: { index: number, time: number, type: string }
   replayState: { session: number, time: number }
-  camera: { isPaused: boolean, carIndex: number }
+  cameraState: { isPaused: boolean, car: { driver: string, number: string }}
   cars: CarState[]
   findCar: (number: string) => CarState | undefined
 }
@@ -31,7 +30,7 @@ const INITIAL_STATE: AppState = {
   weekend: { sessions: [], trackLength: '1.0 km' },
   session: { index: 0, time: 0, type: 'Unknown' },
   replayState: { session: 0, time: 0 },
-  camera: { isPaused: false, carIndex: 0 },
+  cameraState: { isPaused: false, car: { driver: 'None', number: '--'}},
   cars: [],
   findCar: () => undefined
 }
@@ -49,12 +48,18 @@ export function watch(sdk: SDK.Client): Observable<AppStateUpdate> {
   )
 }
 
+const nullDriver = { UserName: 'None', CarNumber: '---' };
+
 function toAppState(previous: AppState, telemetry: SDK.TelemetryValues, session: SDK.SessionData): AppStateUpdate {
-  const cars = toCarState(telemetry, session)
+  const cars = toCarState(telemetry, session);
+  const findCar = lookup(cars);
+  const camDriver = session.DriverInfo.Drivers[telemetry.CamCarIdx] ?? nullDriver;
 
   return { 
     previous, 
     current: {
+      cars,
+      findCar,
       weekend: {
         sessions: session.SessionInfo.Sessions.map((s: {SessionType: string })=> s.SessionType),
         trackLength: session.WeekendInfo.TrackLength
@@ -68,12 +73,13 @@ function toAppState(previous: AppState, telemetry: SDK.TelemetryValues, session:
         session: telemetry.ReplaySessionNum,
         time: telemetry.ReplaySessionTime,
       },
-      camera: { 
+      cameraState: { 
         isPaused: telemetry.ReplayPlaySpeed === 0,
-        carIndex: telemetry.CamCarIdx
-      },
-      cars,
-      findCar: lookup(cars)
+        car: {
+          driver: camDriver.UserName,
+          number: camDriver.CarNumber
+        }
+      }
     }
   }
 }
