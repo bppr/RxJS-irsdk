@@ -39,5 +39,15 @@ export const testIncidents: MessageItem[] = [
         }
       ]
     }
+  },
+  {
+    type: 'flag',
+    id: randomId(),
+    archived: false, 
+    data: {
+      car: { number: '18', driver: 'Mike Racecar' },
+      time: { index: 0, time: 125.7 },
+      flags: ['furled']
+    }
   }
 ]

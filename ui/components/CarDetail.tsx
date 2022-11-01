@@ -37,7 +37,7 @@ function DetailTable(props: { data: IncidentMsg[]}) {
   if(props.data.length === 0)
     return <Typography variant="subtitle2">Nothing yet.</Typography>
 
-  const datarow = (msg: IncidentMsg) => {
+  const toRow = (msg: IncidentMsg) => {
     const incident = msg.data.incidents[0];
 
     return <TableRow key={msg.id}>
@@ -49,7 +49,7 @@ function DetailTable(props: { data: IncidentMsg[]}) {
   }
   
   return <TableContainer>
-    <Table>
+    <Table size="small">
       <TableHead>
         <TableRow>
           <TableCell>Lap</TableCell>
@@ -60,7 +60,7 @@ function DetailTable(props: { data: IncidentMsg[]}) {
       </TableHead>
 
       <TableBody>
-        { props.data.map(datarow) }
+        { props.data.map(toRow) }
       </TableBody>
     </Table>
   </TableContainer>

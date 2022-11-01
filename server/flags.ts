@@ -1,4 +1,4 @@
-import { xor } from 'lodash';
+import { difference } from 'lodash';
 import { Flag } from './messages';
 import { AppStateUpdate } from "./state";
 
@@ -9,13 +9,13 @@ export function detectFlags({ current, previous }: AppStateUpdate): Flag[] {
     if (!prevCar || car.trackSurface === 'NotInWorld')
       return [];
 
-    const diff = xor(car.flags, prevCar.flags);
+    const diff = difference(car.flags, prevCar.flags);
     
-    if (diff.length == 0 || car.flags.length < prevCar.flags.length)
+    if (diff.length == 0)
       return [];
 
     return [{
-      car: car,
+      car: { number: car.number, driver: car.driver.name },
       flags: diff,
       time: current.session
     }];

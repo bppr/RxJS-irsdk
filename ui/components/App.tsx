@@ -74,6 +74,10 @@ export function App({ gateway }: { gateway: Gateway }) {
       return () => updateMessage(id, { resolution, archived: true });
     },
 
+    unresolveMessage(id: string) {
+      return () => updateMessage(id, { resolution: undefined, archived: false })
+    },
+
     toggleArchivedMessages() {
       setConfig(prev => ({...prev, showArchivedMessages: !prev.showArchivedMessages }))
     }

@@ -10,6 +10,11 @@ function main() {
   const container = document.getElementById('app');
   const root = createRoot(container!);
   const gateway = createGateway(PORT);
+
+  addEventListener('beforeunload', (ev) => {
+    ev.preventDefault();
+    return 'You sure?'
+  })
   
   root.render(<App gateway={gateway} />);
 }

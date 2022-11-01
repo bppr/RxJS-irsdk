@@ -25,7 +25,7 @@ export type SystemState = {
 };
 
 export type Flag = {
-  car: { number: string };
+  car: { number: string, driver: string };
   time: { index: number, time: number };
   flags: string[];
 };
