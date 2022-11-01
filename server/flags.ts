@@ -14,6 +14,8 @@ export function detectFlags({ current, previous }: AppStateUpdate): Flag[] {
     if (diff.length == 0)
       return [];
 
+    console.log("FLAGS:", diff.join(", "));
+
     return [{
       car: { number: car.number, driver: car.driver.name },
       flags: diff,
