@@ -1,9 +1,10 @@
-import React from 'react';
-import { IconButton, Stack, TableCell, TableContainer, Table, TableHead, TableRow, Typography, TableBody } from '@mui/material';
-import { KeyboardArrowLeft } from '@mui/icons-material';
+import React, { useContext } from 'react';
+import { IconButton, Stack, TableCell, TableContainer, Table, TableHead, TableRow, Typography, TableBody, ButtonGroup } from '@mui/material';
+import { Clear, KeyboardArrowLeft, Search, Undo } from '@mui/icons-material';
 import { IncidentMsg } from "./App";
 import { displayTime } from '../utils/displayTime';
 import _ from 'lodash';
+import { AppContext } from '../AppContext';
 
 export function CarDetail(props: { incidents: IncidentMsg[]; unselectCar(): void; }) {
   const { incidents, unselectCar } = props;
@@ -33,21 +34,41 @@ export function CarDetail(props: { incidents: IncidentMsg[]; unselectCar(): void
   </Stack>;
 }
 
-function DetailTable(props: { data: IncidentMsg[]}) {
-  if(props.data.length === 0)
+function DetailTable(props: { data: IncidentMsg[] }) {
+  const { gateway, actions } = useContext(AppContext);
+
+  function replay(msg: IncidentMsg) {
+    return () => {}
+  }
+
+  if (props.data.length === 0)
     return <Typography variant="subtitle2">Nothing yet.</Typography>
 
   const toRow = (msg: IncidentMsg) => {
     const incident = msg.data.incidents[0];
 
     return <TableRow key={msg.id}>
-      <TableCell>{ incident.location.lap }</TableCell>
-      <TableCell>{ incident.location.lapPct }</TableCell>
-      <TableCell>{ displayTime(incident.time.time) }</TableCell>
-      <TableCell>Controls</TableCell>
+      <TableCell>{incident.location.lap}</TableCell>
+      <TableCell>{incident.location.lapPct}</TableCell>
+      <TableCell>{displayTime(incident.time.time)}</TableCell>
+      <TableCell>
+        <ButtonGroup size="large">
+          <IconButton title="Show Replay" onClick={replay(msg)}>
+            <Search />
+          </IconButton>
+
+          <IconButton title="Unresolve" onClick={actions.unresolveMessage(msg.id)}>
+            <Undo />
+          </IconButton>
+
+          <IconButton title="Dismiss" onClick={actions.resolveMessage(msg.id, 'dismissed')}>
+            <Clear />
+          </IconButton>
+        </ButtonGroup>
+      </TableCell>
     </TableRow>
   }
-  
+
   return <TableContainer>
     <Table size="small">
       <TableHead>
@@ -60,7 +81,7 @@ function DetailTable(props: { data: IncidentMsg[]}) {
       </TableHead>
 
       <TableBody>
-        { props.data.map(toRow) }
+        {props.data.map(toRow)}
       </TableBody>
     </Table>
   </TableContainer>

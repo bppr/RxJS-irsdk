@@ -17,12 +17,14 @@ const noop = () => {}
 type Actions = {
   clearAll(): void
   resolveMessage(id: string, resolution: ResolutionType): () => void
+  unresolveMessage(id: string): () => void
   toggleArchivedMessages(): void
 }
 
 const nullActions: Actions = {
   clearAll() {},
   resolveMessage: () => noop,
+  unresolveMessage: () => noop,
   toggleArchivedMessages() {}
 }
 
