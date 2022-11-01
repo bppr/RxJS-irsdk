@@ -1,11 +1,6 @@
 import { xor } from 'lodash';
+import { Flag } from './messages';
 import { AppStateUpdate } from "./state";
-
-export type Flag = {
-  car: string;
-  event: 'added' | 'removed';
-  flags: string[];
-};
 
 export function detectFlags({ current, previous }: AppStateUpdate): Flag[] {
   return current.cars.flatMap(car => {
@@ -15,13 +10,14 @@ export function detectFlags({ current, previous }: AppStateUpdate): Flag[] {
       return [];
 
     const diff = xor(car.flags, prevCar.flags);
-    if (diff.length == 0)
+    
+    if (diff.length == 0 || car.flags.length < prevCar.flags.length)
       return [];
 
     return [{
-      car: car.number,
-      event: car.flags.length > prevCar.flags.length ? 'added' : 'removed',
-      flags: diff
+      car: car,
+      flags: diff,
+      time: current.session
     }];
   });
 }

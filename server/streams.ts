@@ -5,7 +5,7 @@ import { bufferTime, filter, groupBy, map, mergeMap, throttleTime } from 'rxjs/o
 import { detectIncidents, detectCautionIncidents, Incident } from './incidents';
 import { detectFlags } from './flags';
 import { AppStateUpdate, watch } from "./state";
-import { IncidentGroup, SystemState } from "../ui/messages";
+import { IncidentGroup, SystemState } from "./messages";
 
 export function streams(irsdk: SDK.Client) {
   const stream = watch(irsdk)
@@ -53,7 +53,7 @@ function mapIncidentData(incidents: Incident[]): IncidentGroup {
       type,
       xCount: xCount ?? 0,
       time,
-      location: car.currentLapPct
+      location: { lap: car.currentLap, lapPct: car.currentLapPct }
     })),
     car: { driver, number }
   }
