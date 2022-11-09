@@ -1,7 +1,9 @@
 # Quick Start
 
+```
+npm install
+```
 ### Build the UI
-
 ```
 npx webpack
 ```
