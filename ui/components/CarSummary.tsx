@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import _ from 'lodash';
 import { IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { KeyboardArrowRight } from '@mui/icons-material';
+import { KeyboardArrowRight, Videocam } from '@mui/icons-material';
 import { IncidentMsg, MessageItem } from "./App";
 import { CarDetail } from './CarDetail';
+import { AppContext } from '../AppContext';
 
 export function CarSummary(props: { messages: MessageItem[] }) {
   const incidents = props.messages.filter(m => m.type === 'incident') as IncidentMsg[];
@@ -32,6 +33,7 @@ export function CarTable({ cars, selectCar }: { cars: { [number: string]: Incide
 
     <TableHead>
       <TableRow>
+        <TableCell />
         <TableCell>Car #</TableCell>
         <TableCell>Driver</TableCell>
         <TableCell>Off-Tracks</TableCell>
@@ -49,24 +51,30 @@ export function CarTable({ cars, selectCar }: { cars: { [number: string]: Incide
 }
 
 function CarTableRow({ messages, selectDriver }: { messages: IncidentMsg[], selectDriver: () => void }) {
+  const { gateway } = useContext(AppContext);
+  
   const car = messages[0].data.car;
   const offTracks = messages.filter(m => m.resolution === 'off-track');
   const locs = messages.filter(m => m.resolution === 'loc');
 
-  const onClickHandler = (ev: React.MouseEvent<any>) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-    selectDriver()
+  function showCar() {
+    gateway.focusCar(car.number);
+    gateway.goLive();
   }
 
   return <React.Fragment>
     <TableRow>
+      <TableCell>
+        <IconButton aria-label="Show Car" size="small" onClick={showCar}>
+          <Videocam />
+        </IconButton>
+      </TableCell>
       <TableCell>{ car.number }</TableCell>
       <TableCell>{ car.driver.name }</TableCell>
       <TableCell>{ offTracks.length }</TableCell>
       <TableCell>{ locs.length }</TableCell>
       <TableCell>
-        <IconButton aria-label="Expand" size="small" onClick={onClickHandler}>
+        <IconButton aria-label="Expand" size="small" onClick={selectDriver}>
           <KeyboardArrowRight />
         </IconButton>
       </TableCell>

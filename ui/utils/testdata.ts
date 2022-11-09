@@ -47,7 +47,7 @@ export const testIncidents: MessageItem[] = [
     data: {
       car: { number: '18', driver: 'Mike Racecar' },
       time: { index: 0, time: 125.7 },
-      flags: ['furled']
+      flags: ['Furled']
     }
   }
 ]

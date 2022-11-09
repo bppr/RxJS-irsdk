@@ -42,10 +42,13 @@ export function createInbox(irsdk: SDK.Client) {
       'go-live': () => irsdk.playbackControls.search("ToEnd"),
       'focus-car': () => irsdk.camControls.switchToCar(data.carNumber),
       'replay': () => {
+        console.log(data);
         const sessionMs = (data.sessionTime * 1000) | 0;
+
+        console.log(sessionMs - 4000);
         
         irsdk.camControls.switchToCar(data.carNumber);
-        irsdk.playbackControls.searchTs(data.sessionNumber, Math.max(sessionMs - 4000, 0))
+        irsdk.playbackControls.searchTs(data.sessionIndex, Math.max(sessionMs - 4000, 0))
       }
     };
 

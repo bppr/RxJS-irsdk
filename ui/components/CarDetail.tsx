@@ -1,10 +1,14 @@
-import React, { useContext } from 'react';
-import { IconButton, Stack, TableCell, TableContainer, Table, TableHead, TableRow, Typography, TableBody, ButtonGroup } from '@mui/material';
 import { Clear, KeyboardArrowLeft, Search, Undo } from '@mui/icons-material';
-import { IncidentMsg } from "./App";
-import { displayTime } from '../utils/displayTime';
+import { ButtonGroup, IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import _ from 'lodash';
+import React, { useContext } from 'react';
+
+import { IncidentGroup } from 'server/messages';
+
 import { AppContext } from '../AppContext';
+import { displayTime } from '../utils/displayTime';
+import { formatPct } from '../utils/formatPct';
+import { IncidentMsg } from "./App";
 
 export function CarDetail(props: { incidents: IncidentMsg[]; unselectCar(): void; }) {
   const { incidents, unselectCar } = props;
@@ -37,8 +41,8 @@ export function CarDetail(props: { incidents: IncidentMsg[]; unselectCar(): void
 function DetailTable(props: { data: IncidentMsg[] }) {
   const { gateway, actions } = useContext(AppContext);
 
-  function replay(msg: IncidentMsg) {
-    return () => {}
+  function replay({ time, car }: IncidentGroup) {
+    return () => gateway.replay(time.index, time.time, car.number)
   }
 
   if (props.data.length === 0)
@@ -49,11 +53,11 @@ function DetailTable(props: { data: IncidentMsg[] }) {
 
     return <TableRow key={msg.id}>
       <TableCell>{incident.location.lap}</TableCell>
-      <TableCell>{incident.location.lapPct}</TableCell>
+      <TableCell>{formatPct(incident.location.lapPct)}</TableCell>
       <TableCell>{displayTime(incident.time.time)}</TableCell>
       <TableCell>
         <ButtonGroup size="large">
-          <IconButton title="Show Replay" onClick={replay(msg)}>
+          <IconButton title="Show Replay" onClick={replay(msg.data)}>
             <Search />
           </IconButton>
 
