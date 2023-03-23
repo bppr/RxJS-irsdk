@@ -11,8 +11,8 @@ export function streams(irsdk: SDK.Client) {
   const stream = watch(irsdk)
 
   const system = stream.pipe(
-    map(mapSystemData),
-    throttleTime(1000)
+    throttleTime(1000),
+    map(mapSystemData)
   )
 
   const flags = stream.pipe(
@@ -38,8 +38,13 @@ export function streams(irsdk: SDK.Client) {
   return { system, incidents, flags, cautions };
 }
 
-function mapSystemData({ current: { session, replayState, cameraState }}: AppStateUpdate): SystemState { 
-  return { session, replayState, cameraState }
+function mapSystemData({ current: { session, replayState, cameraState, cars }}: AppStateUpdate): SystemState { 
+  return { 
+    session, 
+    replayState, 
+    cameraState,
+    cars
+  }
 }
 
 function mapIncidentData(incidents: Incident[]): IncidentGroup {

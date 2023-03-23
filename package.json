@@ -3,7 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "ts-node index.ts"
+    "start": "ts-node index.ts",
+    "build": "tsc -p tsconfig.json"
+  },
+  "bin": "build/index.js",
+  "pkg": {
+    "scripts": "build/index.js",
+    "assets": "build/ui/**/*",
+    "targets": ["node18-win-x64"],
+    "outputPath": "dist"
   },
   "author": "",
   "license": "ISC",

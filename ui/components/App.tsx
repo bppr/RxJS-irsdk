@@ -6,7 +6,7 @@ import { AppContext } from '../AppContext';
 import { Gateway } from '../Gateway';
 
 import { randomId } from '../utils/randomId';
-import { testIncidents } from '../utils/testdata';
+import { testIncidents, testSystem } from '../utils/testdata';
 import { update } from '../utils/update';
 
 import { CarSummary } from './CarSummary';
@@ -24,13 +24,14 @@ export type Message<T, Data> = {
 };
 
 export type IncidentMsg = Message<'incident', IncidentGroup>
-export type FlagMsg = Message<'flag', Flag>
+export type FlagMsg = Message<'flag', Flag[]>
 export type MessageItem = IncidentMsg | FlagMsg;
 
 export const DEFAULT_SYSTEM_STATE: SystemState = {
   session: { index: 0, time: 0, type: "Unknown" },
   replayState: { session: 0, time: 0 },
-  cameraState: { isPaused: true, car: { driver: 'None', number: '---' } }
+  cameraState: { isPaused: true, car: { driver: 'None', number: '---' } },
+  cars: []
 };
 
 export type AppConfig = {
@@ -40,8 +41,8 @@ export type AppConfig = {
 export const DEFAULT_APP_CONFIG = { showArchivedMessages: false };
 
 export function App({ gateway }: { gateway: Gateway }) {
-  const [messages, setMessages] = useState<MessageItem[]>(testIncidents);
-  const [config, setConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
+  const [messages, setMessages] = useState<MessageItem[]>([]);
+  const [config, setConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG);
   const [system, setSystem] = useState<SystemState>(DEFAULT_SYSTEM_STATE);
 
   function receiveMessage(message: any) {
@@ -51,7 +52,7 @@ export function App({ gateway }: { gateway: Gateway }) {
     if (message.type === 'system')
       setSystem(message.data);
 
-    if (['incident', 'flags'].includes(message.type))
+    if (['incident', 'flag'].includes(message.type))
       setMessages(prev => [...prev, { ...message, archived: false, id: randomId() }]);
   }
 

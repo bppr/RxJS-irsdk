@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { AltRoute, Clear, NearbyError, RemoveRoad, Search, VideogameAssetOff, Warning } from '@mui/icons-material';
+import { AltRoute, Clear, RemoveRoad, Search, VideogameAssetOff, Warning } from '@mui/icons-material';
 import { Avatar, ButtonGroup, Card, CardHeader, IconButton, SvgIcon } from '@mui/material';
 
 import { displayTime } from '../utils/displayTime';
@@ -52,17 +52,17 @@ function getPrimaryType(incident: IncidentGroup) {
   const types = incident.types;
   
   if(types.includes("Caution")) return "Caution";
-  if(types.includes("Unsafe Rejoin")) return "Unsafe Rejoin";
+  if(types.includes("Unsafe Rejoin")) return "+ Unsafe Rejoin";
   
   return "xCount";
 }
 
 function getIncidentIcon(incident: IncidentGroup, type: string) {
+  const xText = <text dx="-1" dy="20" color="white">{ incident.xCount }x</text>;
+  
   return {
     "Caution": <Warning color="warning" />,
     "Track Limits": <AltRoute color="primary" />,
-    "Unsafe Rejoin": <NearbyError color="warning" />,
-  }[type] ?? <SvgIcon>
-    <text dx="-1" dy="20" color="white">{ incident.xCount }x</text>
-  </SvgIcon>
+    "Unsafe Rejoin": <SvgIcon color="warning">{ xText }</SvgIcon>,
+  }[type] ?? <SvgIcon>{ xText }</SvgIcon>
 }

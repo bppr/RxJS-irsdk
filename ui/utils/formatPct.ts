@@ -3,5 +3,5 @@ export function formatPct(decimal: number, digits: number = 2) {
     maximumSignificantDigits: 2 + digits
   })
 
-  return `{rounded}%`
+  return `${rounded}%`
 }

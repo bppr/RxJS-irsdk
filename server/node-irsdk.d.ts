@@ -30,6 +30,7 @@ declare module 'node-irsdk-2021' {
     ReplayPlaySpeed: number
     CamCarIdx: number
     CarIdxLap: number[]
+    CarIdxPosition: number[]
     CarIdxLapDistPct: number[]
     CarIdxOnPitRoad: boolean[]
     CarIdxTrackSurface: string[]
@@ -66,7 +67,7 @@ declare module 'node-irsdk-2021' {
     }
     SessionInfo: {
       Sessions: {
-        SessionType: 'Race' | 'Qualifying' | 'Practice' | 'Unknown'
+        SessionType: string
         ResultsFastestLap: {
           CarIdx: number
           FastestLap: number

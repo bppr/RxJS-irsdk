@@ -17,6 +17,7 @@ export type AppStateUpdate = { previous: AppState, current: AppState }
 export type CarState = {
   index: number
   number: string
+  position: number
   flags: string[]
   driver: { name: string, team: string }
   xCount: number
@@ -91,6 +92,7 @@ function toCarState(telemetry: SDK.TelemetryValues, session: SDK.SessionData): C
     return {
       index,
       number: driver.CarNumber,
+      position: telemetry.CarIdxPosition[index],
       driver: { name: driver.UserName, team: driver.TeamName},
       flags: telemetry.CarIdxSessionFlags[index],
       xCount: driver.TeamIncidentCount,

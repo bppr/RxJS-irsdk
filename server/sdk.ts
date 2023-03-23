@@ -1,4 +1,7 @@
-import * as SDK from 'node-irsdk-2021';
+// import * as SDK from 'node-irsdk-2021';
+
+// this is needed to hack around .node file for build
+const SDK = require('node-irsdk-2021');
 
 const opts = {
   sessionInfoUpdateInterval: 100,
@@ -8,8 +11,8 @@ const opts = {
 export function initSDK() {
   const irsdk = SDK.init(opts);
 
-  irsdk.on('connected', () => console.log('iRacing connection'));
-  irsdk.on('disconnected', () => console.log('iRacing disconnection'));
+  irsdk.on('Connected', () => console.log('iRacing connection'));
+  irsdk.on('Disconnected', () => console.log('iRacing disconnection'));
 
   return irsdk;
 }

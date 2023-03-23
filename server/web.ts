@@ -1,10 +1,11 @@
 import express from 'express';
 import { WebSocketServer, WebSocket, RawData } from 'ws';
 import * as SDK from 'node-irsdk-2021';
+import * as path from 'path';
 
 export function initWeb(irsdk: SDK.Client) {
   const server = express()
-    .use(express.static("./build/ui"));
+    .use(express.static(path.join(__dirname, "../ui")));
 
   const ws = new WebSocketServer({ port: 3001 })
   const inbox = createInbox(irsdk);
@@ -18,7 +19,7 @@ export function initWeb(irsdk: SDK.Client) {
 
   return { 
     publish: <T>(type: string, data: T) => send(ws, { type, data }), 
-    run: () => server.listen(3000, () => console.log("server started"))
+    run: () => server.listen(3000, () => console.log("server started: http://localhost:3000"))
   };
 }
 
@@ -42,11 +43,8 @@ export function createInbox(irsdk: SDK.Client) {
       'go-live': () => irsdk.playbackControls.search("ToEnd"),
       'focus-car': () => irsdk.camControls.switchToCar(data.carNumber),
       'replay': () => {
-        console.log(data);
         const sessionMs = (data.sessionTime * 1000) | 0;
-
-        console.log(sessionMs - 4000);
-        
+               
         irsdk.camControls.switchToCar(data.carNumber);
         irsdk.playbackControls.searchTs(data.sessionIndex, Math.max(sessionMs - 4000, 0))
       }

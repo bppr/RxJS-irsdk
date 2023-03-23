@@ -17,12 +17,12 @@ export function MessageFlag({ message }: { message: FlagMsg; }) {
   }
 
   const headerProps = {
-    title: `#${data.car.number} ${data.car.driver}`,
-    subheader: `Flag ${data.flags.map(_.capitalize).join(', ')} / ${displayTime(data.time.time)}`,
+    title: `#${data[0].car.number} ${data[0].car.driver}`,
+    subheader: `Flag ${data.flatMap(d=>d.flags).map(_.capitalize).join(', ')} / ${displayTime(data[0].time.time)}`,
     avatar: <Avatar><FlagIcon /></Avatar>,
     style: { opacity: message.archived ? 0.5 : 1 },
     action: <ButtonGroup size="large">
-      <IconButton title="Show Replay" onClick={replay(data)}>
+      <IconButton title="Show Replay" onClick={replay(data[0])}>
         <Search />
       </IconButton>
 

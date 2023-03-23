@@ -28,8 +28,6 @@ export default function MessageFeed(props: { messages: MessageItem[]; }) {
   </Stack>
 }
 
-const FLAG_WHITELIST = ['furled'];
-
 function displayMessage(config: AppConfig) {
   return (msg: MessageItem) => {
     if (!config.showArchivedMessages && msg.archived) 
@@ -38,9 +36,9 @@ function displayMessage(config: AppConfig) {
     if (msg.type === "incident")
       return <MessageIncident key={msg.id} message={msg} />
     
-    if (msg.type === "flag" && msg.data.flags.find(f => FLAG_WHITELIST.includes(f)))
+    if (msg.type === "flag")
       return <MessageFlag key={msg.id} message={msg} />
 
-    return <></>;
+    return null;
   }
 }

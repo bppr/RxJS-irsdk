@@ -1,3 +1,5 @@
+import { CarState } from "./state";
+
 export type IncidentGroup = {
   xCount: number;
   time: { index: number; time: number; };
@@ -22,6 +24,7 @@ export type SystemState = {
   session: { index: number; time: number; type: string; };
   replayState: { session: number; time: number; };
   cameraState: { isPaused: boolean; car: { driver: string; number: string; }; };
+  cars: CarState[]
 };
 
 export type Flag = {
